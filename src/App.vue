@@ -6,6 +6,7 @@
 
 <style lang="less">
 // 公共样式
+@import url("//at.alicdn.com/t/font_1426139_jm7n2373nlh.css");
 
 * {
   margin: 0;

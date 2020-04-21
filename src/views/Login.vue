@@ -6,7 +6,7 @@
         <el-input v-model="form.username"></el-input>
       </el-form-item>
       <el-form-item label="密码:" prop="password">
-        <el-input v-model="form.password" type="password"></el-input>
+        <el-input v-model="form.password" type="password" @keydown.enter.native="onSubmit"></el-input>
       </el-form-item>
       <el-form-item class="submit">
         <el-button type="primary" @click="onSubmit">登录</el-button>
@@ -44,6 +44,11 @@ export default {
   methods: {
     onSubmit() {
       //   console.log("submit!");
+      if (this.form.username == "" || this.form.password == "") {
+        this.$alert("用户名或者密码不能为空，请重新登录", "错误", {
+          confirmButtonText: "确定"
+        });
+      }
       this.$refs.formName.validate(valid => {
         if (valid) {
           //   提交表单验证
@@ -51,23 +56,26 @@ export default {
             url: "/login",
             method: "post",
             data: this.form
-          }).then(res => {
-            // console.log(res);
-            const { data } = res.data;
-            if (data.user.role.type !== "admin") {
+          })
+            .then(res => {
+              console.log(res);
+              const { data } = res.data;
+              if (data.user.role.type !== "admin") {
+                this.$message({
+                  message: "非管理人员不可登录",
+                  type: "warning"
+                });
+                return;
+              }
+              const userStr = JSON.stringify(data);
+              localStorage.setItem("userInfo", userStr);
               this.$message({
-                message: "非管理人员不可登录",
-                type: "warning"
-              });
-              return;
-            }
-            const userStr = JSON.stringify(data);
-            localStorage.setItem("userInfo", userStr);
-             this.$message({
                 message: "登录成功",
                 type: "success"
               });
-          });
+              this.$router.push("/");
+            })
+           
         }
       });
     }
